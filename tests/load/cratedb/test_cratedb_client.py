@@ -72,6 +72,7 @@ def test_cratedb_credentials_native_value(environment) -> None:
 
 
 def test_cratedb_data_location() -> None:
+    # The database path is dropped, and the port defaults to 5432.
     config = CrateDbClientConfiguration(
         credentials=CrateDbCredentials("cratedb://loader:loader@localhost/dlt_data")
     )

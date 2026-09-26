@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Fixed every load failing on dlt 1.30 with "dlt cannot determine the data location
+- Fixed every load that writes data failing on dlt 1.30 with "dlt cannot determine the data location
   of destination `cratedb`": the destination now reports its cluster address
   (`host:port`) as its data location, since CrateDB has no databases.
 - Fixed `merge`, `delete-insert`, and `refresh="drop_resources"` crashing on CrateDB
