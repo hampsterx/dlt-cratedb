@@ -26,3 +26,10 @@ class CrateDbClientConfiguration(PostgresClientConfiguration):
         default="cratedb", init=False, repr=False, compare=False
     )
     credentials: CrateDbCredentials
+
+    def data_location(self) -> str:
+        """Returns host:port. CrateDB has no databases, so the address identifies the data."""
+        if not self.credentials or not self.credentials.host:
+            self._no_data_location("the configuration has no host")
+        port = self.credentials.port or self.DEFAULT_PORT
+        return f"{self.credentials.host}:{port}"
