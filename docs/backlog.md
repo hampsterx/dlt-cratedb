@@ -3,11 +3,13 @@
 ## Iteration +1
 
 - Check if the Redshift literal escaper is the right choice for all
-  data types it is handling. It leaves newlines inside strings unescaped,
-  while dlt's `insert_values` loader splits a load file into statements
-  line by line. A load file larger than `max_query_length // 2` (2 MiB)
-  that carries multi-line strings is cut in the middle of a string and
-  fails with `SyntaxError: ... no viable alternative at input 'VALUES ...`.
+  data types it is handling. The adapter's `escape_cratedb_literal`
+  leaves newlines inside strings unescaped, while dlt's `insert_values`
+  loader assumes one row per line: it reads `max_query_length // 2`
+  characters and completes the statement up to the next newline. When a
+  load file is larger than that, the cut can land inside a multi-line
+  string, and the load fails with
+  `SyntaxError: ... no viable alternative at input 'VALUES ...`.
   The `players_games` resource of the `chess` source runs into this.
   CrateDB accepts `E'...'` escape strings, e.g. `SELECT E'a\nb'`.
 
@@ -18,10 +20,10 @@
 
 - Documentation: How JSONB/ARRAYs are mapped to CrateDB
 
-- The `merge` followup job is currently defunct with CrateDB.
-  It has been replaced by a `replace` job, so a `merge` load drops all
-  rows that are not part of the batch: loading `{1, 2}` and then `{2, 3}`
-  leaves `{2, 3}`. See GH-6.
+- CrateDB does not support the `merge` followup job yet. The adapter
+  runs a staging `replace` job instead, so a `merge` load drops all rows
+  that are not part of the batch: loading `{1, 2}` and then `{2, 3}`
+  leaves `{2, 3}`. See [GH-6](https://github.com/crate/dlt-cratedb/issues/6).
 
 - Is it possible to use an `adapter` to better support CrateDB's special
   data types? For example, full round-tripping using `sys.summits` isn't
