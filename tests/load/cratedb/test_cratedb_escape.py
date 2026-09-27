@@ -52,12 +52,12 @@ def test_escape_string(value: str, expected: str) -> None:
     assert escape_cratedb_literal(value) == expected
 
 
-def test_escape_object_stays_on_one_line() -> None:
-    rendered = escape_cratedb_literal({"text": "line\nbreak", "list": ["it's\r\n"]})
-    assert rendered.startswith("E'")
-    assert rendered.endswith("::OBJECT(DYNAMIC)")
-    assert "\n" not in rendered
-    assert "\r" not in rendered
+def test_escape_object() -> None:
+    # `json.dumps` already escapes newlines and backslashes, and the literal escapes its output.
+    rendered = escape_cratedb_literal({"text": "it's", "path": "C:\\", "lines": ["a\nb"]})
+    assert rendered == (
+        """E'{"text": "it\\'s", "path": "C:\\x5c\\x5c", "lines": ["a\\x5cnb"]}'::OBJECT(DYNAMIC)"""
+    )
 
 
 def _pipeline(credentials: CrateDbCredentials, **destination_kwargs: Any) -> dlt.Pipeline:
