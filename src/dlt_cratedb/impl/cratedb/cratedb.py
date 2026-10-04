@@ -133,8 +133,8 @@ class CrateDbClient(PostgresClient):
         Refresh the pipeline state table, when this schema syncs state.
 
         The schema can list the table while the destination lacks it, for example after it
-        was dropped by hand: dlt skips DDL for a schema version it already stored. Loads
-        succeeded in that case before, so keep them succeeding.
+        was dropped by hand: dlt skips DDL for a schema version it already stored. A load
+        that writes no new state row succeeded in that case before, so keep it succeeding.
         """
         if self.schema.state_table_name not in self.schema.tables:
             return
