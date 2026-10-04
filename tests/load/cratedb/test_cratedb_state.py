@@ -100,9 +100,10 @@ def test_state_restored_by_a_fresh_pipeline(
     pipeline = _pipeline(credentials, dataset_name, tmp_path / "p1")
     pipeline.run(items([1, 2]))
 
-    # Disable periodic refresh on the state table, so only an explicit refresh can make
-    # the next load's state row visible. Changing the interval queues a refresh of its
-    # own: let it land before the second load.
+    # Disable periodic refresh on the state table, so the next load's state row stays
+    # hidden unless something refreshes it. CrateDB can still refresh internally, so this
+    # makes a pass without the fix unlikely rather than impossible. Changing the interval
+    # queues a refresh of its own: let it land before the second load.
     with pipeline.sql_client() as client:
         state_table = client.make_qualified_table_name(pipeline.default_schema.state_table_name)
         client.execute_sql(f"ALTER TABLE {state_table} SET (refresh_interval = 0)")

@@ -119,8 +119,8 @@ class CrateDbClient(PostgresClient):
 
         dlt restores pipeline state by joining `_dlt_pipeline_state` to `_dlt_loads`, so
         both have to show this load's rows before the next run reads them back. The state
-        table is refreshed on its own, because a missing relation fails a multi-table
-        `REFRESH` for every table in it.
+        table is refreshed in its own statement, so a missing state table cannot get in the
+        way of refreshing `_dlt_loads`.
         """
         result = super().complete_load(load_id=load_id)
         table_name = self.sql_client.make_qualified_table_name(self.schema.loads_table_name)
